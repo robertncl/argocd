@@ -1,0 +1,4 @@
+# argocd
+
+install
+
