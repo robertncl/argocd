@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: arc-runner-set
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: ghcr.io/actions/actions-runner-controller-charts
+    chart: gha-runner-scale-set
+    targetRevision: 0.15.0
+    helm:
+      releaseName: arc-runner-set
+      valuesObject:
+        # org (https://github.com/<org>) or repo (https://github.com/<org>/<repo>) to register runners with
+        githubConfigUrl: https://github.com/robertncl
+        # pre-created secret in arc-runners, see README
+        githubConfigSecret: arc-github-secret
+        # used as the `runs-on` label in workflows
+        runnerScaleSetName: arc-runner-set
+        minRunners: 0
+        maxRunners: 5
+        # helm lookup does not work under Argo CD, so point at the controller explicitly
+        controllerServiceAccount:
+          namespace: arc-systems
+          name: arc-gha-rs-controller
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: arc-runners
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true

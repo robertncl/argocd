@@ -21,3 +21,15 @@ add application
 kubectl create ns apps
 kubectl apply -f apps.yaml
 ```
+
+add github actions runner controller (ARC)
+
+```
+kubectl apply -f arc-controller.yml
+
+kubectl create ns arc-runners
+kubectl create secret generic arc-github-secret -n arc-runners --from-literal=github_token='<PAT>'
+kubectl apply -f arc-runner-set.yml
+```
+
+use in a workflow with `runs-on: arc-runner-set`
